@@ -6,6 +6,10 @@
 			array("plugin"=>"api","controller"=>'users',"action" => "login")
 		);
 	Router::connect(
+		"/users/login",
+		array("plugin"=>"api","controller"=>'users',"action" => "login")
+	);
+	Router::connect(
 			"/register",
 			array("plugin"=>"api","controller"=>'users',"action" => "add")
 		);
