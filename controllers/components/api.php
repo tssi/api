@@ -157,7 +157,7 @@ class ApiComponent extends Object {
 			   }
 		   }
 	   if(isset($data[$__Class]['reorder'])){
-		   $data =  $this->apiReorder($data[$__Class]['reorder']);
+		   $data =  $this->apiReorder($data[$__Class]['reorder'],$__Class);
 		   unset($data[$__Class]['reorder']);
 	   }
 	   $this->controller->data = $data;
@@ -190,10 +190,10 @@ class ApiComponent extends Object {
 	   $meta['epoch'] = time();
 	   $this->controller->Session->write('meta',$meta);
    }
-	protected function apiReorder($data){
+	protected function apiReorder($data,$class){
 		$stack = array();
 		foreach($data as $index=>$value){
-			$item =  array('id'=>$value, 'order'=>$index+1);
+			$item =  array($class=>array('id'=>$value, 'order'=>$index+1, 'sequence'=>$index+1));
 			array_push($stack,$item);
 		}
 		return $stack;
