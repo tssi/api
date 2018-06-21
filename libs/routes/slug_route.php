@@ -1,4 +1,5 @@
 <?php
+Configure::write('Api.MASTER_ROUTES','');
 class SlugRoute extends CakeRoute {
     function parse($url) {
 		$params = parent::parse($url);

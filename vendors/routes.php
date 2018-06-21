@@ -1,5 +1,7 @@
 <?php
 	//API Routing
+	$master_routes = Configure::read('Api.MASTER_ROUTES');
+	$master_routes = explode('|',$master_routes);
 	Router::parseExtensions('json');
 	Router::connect(
 			"/login",
@@ -17,6 +19,70 @@
 			"/logout",
 			array("plugin"=>"api","controller"=>'users',"action" => "logout")
 		);
+		
+	foreach($master_routes as $route):
+		Router::connect(
+			"/".$route."/add",
+			array("controller"=>'master_'.$route,"action" => "add")
+		);
+		Router::connect(
+			"/".$route."/view/:id",
+			array("controller"=>'master_'.$route,"action" => "view"),
+			array("pass"=>array("id"))
+		);
+		Router::connect(
+			"/".$route."/edit/:id",
+			array("controller"=>'master_'.$route,"action" => "edit"),
+			array("pass"=>array("id"))
+		);
+		Router::connect(
+			"/".$route."/delete/:id",
+			array("controller"=>'master_'.$route,"action" => "delete"),
+			array("pass"=>array("id"))
+		);
+		Router::connect(
+			"/".$route,
+			array("controller"=>'master_'.$route,"action" => "index")
+		);
+		
+		Router::connect(
+			"/master_".$route."/add",
+			array("controller"=>'master_'.$route,"action" => "add")
+		);
+		Router::connect(
+			"/master_".$route."/view/:id",
+			array("controller"=>'master_'.$route,"action" => "view"),
+			array("pass"=>array("id"))
+		);
+		Router::connect(
+			"/master_".$route."/edit/:id",
+			array("controller"=>'master_'.$route,"action" => "edit"),
+			array("pass"=>array("id"))
+		);
+		Router::connect(
+			"/master_".$route."/delete/:id",
+			array("controller"=>'master_'.$route,"action" => "delete"),
+			array("pass"=>array("id"))
+		);
+		Router::connect(
+			"/master_".$route,
+			array("controller"=>'master_'.$route,"action" => "index")
+		);
+		
+		Router::connect(
+			"/".$route,
+			array("controller"=>'master_'.$route,"action" => "index","[method]" => "GET")
+		);
+		
+		Router::connect(
+			"/".$route,
+			array("controller"=>'master_'.$route,"action" => "add","[method]" => "POST")
+		);
+		Router::connect(
+			"/".$route,
+			array("controller"=>'master_'.$route,"action"=>"delete", "[method]" => array("DELETE","PUT")),array('routeClass' => 'SlugRoute')
+		);
+	endforeach;
 	Router::connect(
 			"/:controller/add",
 			array("action" => "add")
