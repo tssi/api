@@ -47,10 +47,7 @@
 			array("controller"=>$controller,"action" => "delete"),
 			array("pass"=>array("id"))
 		);
-		Router::connect(
-			"/".$route,
-			array("controller"=>$controller,"action" => "index")
-		);
+		
 		
 		Router::connect(
 			"/master_".$route."/add",
@@ -87,7 +84,11 @@
 		);
 		Router::connect(
 			"/".$route,
-			array("controller"=>$controller,"action"=>"delete", "[method]" => array("DELETE","PUT")),array('routeClass' => 'SlugRoute')
+			array("controller"=>$controller,"action"=>"edit", "[method]" => "PUT"),array('routeClass' => 'SlugRoute')
+		);
+		Router::connect(
+			"/".$route,
+			array("controller"=>$controller,"action"=>"delete", "[method]" => "DELETE"),array('routeClass' => 'SlugRoute')
 		);
 	endforeach;
 	Router::connect(
@@ -114,5 +115,9 @@
 		);
 	Router::connect(
 			"/:controller",
-			array("action"=>"delete", "[method]" => array("DELETE","PUT")),array('routeClass' => 'SlugRoute')
+			array("action"=>"delete", "[method]" => "DELETE"),array('routeClass' => 'SlugRoute')
+		);
+	Router::connect(
+			"/:controller",
+			array("action"=>"edit", "[method]" => "PUT"),array('routeClass' => 'SlugRoute')
 		);
