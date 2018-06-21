@@ -12,20 +12,27 @@ class UsersController extends ApiAppController  {
 	function login(){
 		$user = array('User'=>null);
 		if($user = $this->Auth->user()){
-			$this->redirect('/');
+			if(!$this->isAPIRequest())
+				$this->redirect('/');
 		}
 		if(isset($this->data['User'])){
 			//$this->data['User']['password'] =  $this->Auth->password($this->data['User']['password']);
 			if($this->Auth->login($this->data['User'])){
 				$user = $this->Auth->user();
-				unset($user['User']['created']);
-				unset($user['User']['modified']);
 				if(!$this->RequestHandler->isAjax()){
 					$this->redirect('/');
 				}
 			}else{
 				$this->Session->setFlash(__('Invalid username/password', true));
 			}
+		}
+		if(isset($user['User']['id'])){
+			unset($user['User']['created']);
+			unset($user['User']['modified']);
+		}
+		if($this->isAPIRequest()){
+			$userObj =  $user['User'];
+			$user = array('User'=>array('user'=>$userObj));
 		}
 		$this->set('user', $user);
 	}
