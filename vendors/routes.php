@@ -26,6 +26,8 @@
 		$controller = 'master_'.$route;
 		if($route=='system_defaults')
 			$controller =  'master_configs';
+		else if($route=='educ_levels')
+			$controller =  'departments';
 		Router::connect(
 			"/".$route."/add",
 			array("controller"=>$controller,"action" => "add")
