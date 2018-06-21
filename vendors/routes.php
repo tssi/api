@@ -15,48 +15,53 @@
 			"/register",
 			array("plugin"=>"api","controller"=>'users',"action" => "add")
 		);
+	
 	Router::connect(
 			"/logout",
 			array("plugin"=>"api","controller"=>'users',"action" => "logout")
 		);
 		
 	foreach($master_routes as $route):
+	
+		$controller = 'master_'.$route;
+		if($route=='system_defaults')
+			$controller =  'master_configs';
 		Router::connect(
 			"/".$route."/add",
-			array("controller"=>'master_'.$route,"action" => "add")
+			array("controller"=>$controller,"action" => "add")
 		);
 		Router::connect(
 			"/".$route."/view/:id",
-			array("controller"=>'master_'.$route,"action" => "view"),
+			array("controller"=>$controller,"action" => "view"),
 			array("pass"=>array("id"))
 		);
 		Router::connect(
 			"/".$route."/edit/:id",
-			array("controller"=>'master_'.$route,"action" => "edit"),
+			array("controller"=>$controller,"action" => "edit"),
 			array("pass"=>array("id"))
 		);
 		Router::connect(
 			"/".$route."/delete/:id",
-			array("controller"=>'master_'.$route,"action" => "delete"),
+			array("controller"=>$controller,"action" => "delete"),
 			array("pass"=>array("id"))
 		);
 		Router::connect(
 			"/".$route,
-			array("controller"=>'master_'.$route,"action" => "index")
+			array("controller"=>$controller,"action" => "index")
 		);
 		
 		Router::connect(
 			"/master_".$route."/add",
-			array("controller"=>'master_'.$route,"action" => "add")
+			array("controller"=>$controller,"action" => "add")
 		);
 		Router::connect(
 			"/master_".$route."/view/:id",
-			array("controller"=>'master_'.$route,"action" => "view"),
+			array("controller"=>$controller,"action" => "view"),
 			array("pass"=>array("id"))
 		);
 		Router::connect(
 			"/master_".$route."/edit/:id",
-			array("controller"=>'master_'.$route,"action" => "edit"),
+			array("controller"=>$controller,"action" => "edit"),
 			array("pass"=>array("id"))
 		);
 		Router::connect(
@@ -66,21 +71,21 @@
 		);
 		Router::connect(
 			"/master_".$route,
-			array("controller"=>'master_'.$route,"action" => "index")
+			array("controller"=>$controller,"action" => "index")
 		);
 		
 		Router::connect(
 			"/".$route,
-			array("controller"=>'master_'.$route,"action" => "index","[method]" => "GET")
+			array("controller"=>$controller,"action" => "index","[method]" => "GET")
 		);
 		
 		Router::connect(
 			"/".$route,
-			array("controller"=>'master_'.$route,"action" => "add","[method]" => "POST")
+			array("controller"=>$controller,"action" => "add","[method]" => "POST")
 		);
 		Router::connect(
 			"/".$route,
-			array("controller"=>'master_'.$route,"action"=>"delete", "[method]" => array("DELETE","PUT")),array('routeClass' => 'SlugRoute')
+			array("controller"=>$controller,"action"=>"delete", "[method]" => array("DELETE","PUT")),array('routeClass' => 'SlugRoute')
 		);
 	endforeach;
 	Router::connect(
