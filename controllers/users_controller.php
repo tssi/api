@@ -28,8 +28,15 @@ class UsersController extends ApiAppController  {
 			}
 		}
 		if(isset($user['User']['id'])){
+			$userType = $user['User']['user_type']=$user['User']['user_type_id'];
 			unset($user['User']['created']);
 			unset($user['User']['modified']);
+			unset($user['User']['user_type_id']);
+			$conditions = array('UserGrant.user_type_id'=>$userType);
+			$fields = array('id','master_module_id');
+			$grants = $this->UserType->UserGrant->find('list',compact('conditions','fields'));
+			$access =  array_values($grants);
+			$user['User']['access']=$access;
 		}
 		if($this->isAPIRequest()){
 			$userObj =  $user['User'];
