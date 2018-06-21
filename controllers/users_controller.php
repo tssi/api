@@ -45,11 +45,11 @@ class UsersController extends ApiAppController  {
 		$this->set('user', $user);
 	}
 	function logout(){
+		$this->set('user', array('User'=>array('logout'=>1)));
 		$this->Auth->logout();
-		if(!$this->RequestHandler->isAjax()){
+		if(!$this->isAPIRequest()){
 			$this->redirect('login');
 		}
-		$this->set('user', array(array('User'=>array())));
 	}
 	function index() {
 		$this->User->recursive = 0;
