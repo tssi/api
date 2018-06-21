@@ -16,7 +16,8 @@ class UsersController extends ApiAppController  {
 				$this->redirect('/');
 		}
 		if(isset($this->data['User'])){
-			//$this->data['User']['password'] =  $this->Auth->password($this->data['User']['password']);
+			if($this->isAPIRequest())
+				$this->data['User']['password'] =  $this->Auth->password($this->data['User']['password']);
 			if($this->Auth->login($this->data['User'])){
 				$user = $this->Auth->user();
 				if(!$this->RequestHandler->isAjax()){
