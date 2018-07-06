@@ -77,7 +77,7 @@ class ApiAppController extends Controller {
 		  }else{
 			  $__data = $response['data'][$__Class];
 		  }
-		  if($this->params['controller']=='system_defaults'){
+		  if($this->params['controller']=='master_configs'){
 			  if(count($__data)==1){
 				  $__data = $__data[0];
 			  }
