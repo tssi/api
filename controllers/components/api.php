@@ -45,6 +45,7 @@ class ApiComponent extends Object {
 		$page = (int)(isset($_GET['page'])?$_GET['page']:1);
 		$limit = $conf['limit'] = isset($_GET['limit'])?$_GET['limit']:10;
 		$recursive = isset($Endpoint->recursive)?$Endpoint->recursive:-1;
+		$customPaginate = isset($Endpoint->customPaginate)?$Endpoint->customPaginate:null;
 		$contain = isset($Endpoint->contain)?$Endpoint->contain:null;
 		$consumableFields = isset($Endpoint->consumableFields)?$Endpoint->consumableFields:null;
 		$disposableFields = isset($Endpoint->disposableFields)?$Endpoint->disposableFields:null;
@@ -132,7 +133,13 @@ class ApiComponent extends Object {
 				if($conditions) $paginate['conditions']=$conditions;
 				if($sort&&$direction) $paginate['order']=array($__Class.'.'.$sort=>$direction);
 				$paginate['limit']=$limit?$limit:$count;
-				$this->controller->paginate = array($__Class => $paginate);
+				$paginateVars = array($__Class => $paginate);
+				if($customPaginate){
+					foreach($customPaginate as $cPK=>$cPD){
+						$paginateVars[$cPK] = $cPD;
+					}
+				}
+				$this->controller->paginate = $paginateVars;
 				$paginate['limit']=$count;
 			break;
 			case 'view':
