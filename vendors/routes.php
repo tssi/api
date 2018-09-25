@@ -24,10 +24,13 @@
 			array("plugin"=>"api","controller"=>'users',"action" => "delete","[method]" => "DELETE")
 		);
 	Router::connect(
+			"/reset_pass",
+			array("plugin"=>"api","controller"=>'users',"action" => "reset_pass","[method]" => "POST")
+		);
+	Router::connect(
 			"/logout",
 			array("plugin"=>"api","controller"=>'users',"action" => "logout")
-		);
-		
+		);	
 	foreach($master_routes as $route):
 	
 		$controller = 'master_'.$route;

@@ -2,7 +2,9 @@
 class UsersController extends ApiAppController  {
 	
 	var $name = 'Users';
-	var $uses = array('User','UserType');
+	var $uses = array('User','UserType','MasterConfig');
+	const __DEFAULT_SYS_FLDS = array('MasterConfig.sys_key','MasterConfig.sys_value');
+	const __DEFAULT_SYS_KEYS = array('MasterConfig.sys_key'=>array('DEFAULT_PASS','SCHOOL_ALIAS','ACTIVE_SY'));
 	function beforeFilter() {
 		parent::beforeFilter();
         $this->Auth->autoRedirect = false;
@@ -68,6 +70,7 @@ class UsersController extends ApiAppController  {
 		if (!empty($this->data)) {
 			$this->User->create();
 			if($this->isApiRequest()){
+				if(isset($this->data['User']['password']))
 				$this->data['User']['password']=$this->Auth->password($this->data['User']['password']);
 			}
 			if ($this->User->save($this->data)) {
@@ -115,6 +118,32 @@ class UsersController extends ApiAppController  {
 			$this->redirect(array('action'=>'index'));
 		}
 		$this->Session->setFlash(__('User was not deleted', true));
+		$this->redirect(array('action' => 'index'));
+	}
+	
+	function reset_pass(){
+		if(isset($this->data['User']))
+			$id = $this->data['User']['id'];
+		if (!$id) {
+			$this->Session->setFlash(__('Invalid id for user', true));
+			$this->redirect(array('action'=>'index'));
+		}
+		
+		$fields = self::__DEFAULT_SYS_FLDS;
+		$conditions = self::__DEFAULT_SYS_KEYS;
+		
+		$config = $this->MasterConfig->find('list',compact('fields','conditions'));
+		if(!isset($config['DEFAULT_PASS'])){
+			$defaultPass = $config['SCHOOL_ALIAS'].''.$config['ACTIVE_SY'];
+		}else{
+			$defaultPass = $config['DEFAULT_PASS'];
+		}
+		$this->data['User']['password']=$this->Auth->password($defaultPass);
+		if ($this->User->save($this->data['User'])) {
+			$this->Session->setFlash(__('Password has been reset', true));
+			$this->redirect(array('action'=>'index'));
+		}
+		$this->Session->setFlash(__('Password was not reset', true));
 		$this->redirect(array('action' => 'index'));
 	}
 }	
