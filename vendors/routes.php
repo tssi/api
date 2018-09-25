@@ -15,7 +15,14 @@
 			"/register",
 			array("plugin"=>"api","controller"=>'users',"action" => "add")
 		);
-	
+	Router::connect(
+			"/users",
+			array("plugin"=>"api","controller"=>'users',"action" => "add","[method]" => "POST")
+		);
+	Router::connect(
+			"/users",
+			array("plugin"=>"api","controller"=>'users',"action" => "delete","[method]" => "DELETE")
+		);
 	Router::connect(
 			"/logout",
 			array("plugin"=>"api","controller"=>'users',"action" => "logout")
