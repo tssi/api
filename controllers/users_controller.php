@@ -67,7 +67,11 @@ class UsersController extends ApiAppController  {
 	function add() {
 		if (!empty($this->data)) {
 			$this->User->create();
+			if($this->isApiRequest()){
+				$this->data['User']['password']=$this->Auth->password($this->data['User']['password']);
+			}
 			if ($this->User->save($this->data)) {
+				unset($this->data['User']['password']);
 				$this->Session->setFlash(__('The user has been saved', true));
 				$this->redirect(array('action' => 'index'));
 			} else {
@@ -99,11 +103,14 @@ class UsersController extends ApiAppController  {
 	}
 
 	function delete($id = null) {
+		if(isset($this->data['User']))
+			$id = $this->data['User']['id'];
 		if (!$id) {
 			$this->Session->setFlash(__('Invalid id for user', true));
 			$this->redirect(array('action'=>'index'));
 		}
-		if ($this->User->delete($id)) {
+		$this->data['User']['status']='ARCHV';
+		if ($this->User->save($this->data['User'])) {
 			$this->Session->setFlash(__('User deleted', true));
 			$this->redirect(array('action'=>'index'));
 		}
