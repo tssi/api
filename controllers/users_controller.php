@@ -3,8 +3,8 @@ class UsersController extends ApiAppController  {
 	
 	var $name = 'Users';
 	var $uses = array('User','UserType','MasterConfig');
-	const __DEFAULT_SYS_FLDS = array('MasterConfig.sys_key','MasterConfig.sys_value');
-	const __DEFAULT_SYS_KEYS = array('MasterConfig.sys_key'=>array('DEFAULT_PASS','SCHOOL_ALIAS','ACTIVE_SY'));
+	var $__DEFAULT_SYS_FLDS = array('MasterConfig.sys_key','MasterConfig.sys_value');
+	var $__DEFAULT_SYS_KEYS = array('MasterConfig.sys_key'=>array('DEFAULT_PASS','SCHOOL_ALIAS','ACTIVE_SY'));
 	function beforeFilter() {
 		parent::beforeFilter();
         $this->Auth->autoRedirect = false;
@@ -129,8 +129,8 @@ class UsersController extends ApiAppController  {
 			$this->redirect(array('action'=>'index'));
 		}
 		
-		$fields = self::__DEFAULT_SYS_FLDS;
-		$conditions = self::__DEFAULT_SYS_KEYS;
+		$fields = $this->__DEFAULT_SYS_FLDS;
+		$conditions = $this->__DEFAULT_SYS_KEYS;
 		
 		$config = $this->MasterConfig->find('list',compact('fields','conditions'));
 		if(!isset($config['DEFAULT_PASS'])){
