@@ -95,7 +95,11 @@ class ApiAppController extends Controller {
 		  }
 			
 	 }
-	 return json_encode($response,JSON_NUMERIC_CHECK );
+	 $json_encode =  json_encode($response,JSON_NUMERIC_CHECK );
+	 if($code=json_last_error()){
+	 	return $this->cakeError('errorJSON',compact('code')); 
+	 }
+	 return $json_encode;
   }
 	
 }
