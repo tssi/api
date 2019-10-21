@@ -26,14 +26,35 @@ class UsersController extends ApiAppController  {
 					$this->redirect('/');
 				}
 			}else{
+				$username = $this->data['User']['username'];
+				$user = $this->User->findByUsername($username);
+				if($user){
+					$user['User']['login_failed']=$user['User']['login_failed']+1;
+					$user['User']['ip_failed']=$this->getIPAddr();
+					$this->User->save($user);	
+				}
+				$user = array('User'=>null);
 				$this->Session->setFlash(__('Invalid username/password', true));
 			}
 		}
 		if(isset($user['User']['id'])){
 			$userType = $user['User']['user_type']=$user['User']['user_type_id'];
+			$user['User']['login_success']=$user['User']['login_success']+1;
+			$user['User']['ip_success']=$this->getIPAddr();
+			$this->User->save($user);
+			
 			unset($user['User']['created']);
 			unset($user['User']['modified']);
 			unset($user['User']['user_type_id']);
+			unset($user['User']['login_failed']);
+			unset($user['User']['login_success']);
+			unset($user['User']['ip_failed']);
+			unset($user['User']['ip_success']);
+			
+			
+			if (strtotime($user['User']['password_changed']) > strtotime('-30 days')){
+				unset($user['User']['password_changed']);
+			}
 			$conditions = array('UserGrant.user_type_id'=>$userType);
 			$fields = array('id','master_module_id');
 			$grants = $this->UserType->UserGrant->find('list',compact('conditions','fields'));
@@ -145,6 +166,17 @@ class UsersController extends ApiAppController  {
 		}
 		$this->Session->setFlash(__('Password was not reset', true));
 		$this->redirect(array('action' => 'index'));
+	}
+
+	protected function getIPAddr(){
+		if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+		    $ip = $_SERVER['HTTP_CLIENT_IP'];
+		} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+		    $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		} else {
+		    $ip = $_SERVER['REMOTE_ADDR'];
+		}
+		return $ip;
 	}
 }	
 	
