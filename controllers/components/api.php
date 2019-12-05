@@ -70,7 +70,7 @@ class ApiComponent extends Object {
 		foreach($_GET as $field=>$value){
 			if(!in_array($field,$blacklist)){
 				$values =  explode(',', $value);
-				if(is_array($values))
+				if(count($values)>1)
 					$value=$values;
 				array_push($conditions,array($__Class.'.'.$field=>$value));
 			}
