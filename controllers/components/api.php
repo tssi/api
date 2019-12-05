@@ -69,6 +69,9 @@ class ApiComponent extends Object {
 		$blacklist = array('url','page','limit','offset','sort','order','created','modified','fields','keyword');
 		foreach($_GET as $field=>$value){
 			if(!in_array($field,$blacklist)){
+				$values =  explode(',', $value);
+				if(is_array($values))
+					$value=$values;
 				array_push($conditions,array($__Class.'.'.$field=>$value));
 			}
 		}
