@@ -156,7 +156,7 @@ class ApiComponent extends Object {
    protected function apiPost(&$controller){
 	   $endpoint = $this->controller->params['controller'];
 	   $__Class = Inflector::classify($endpoint);
-	   $input = $_REQUEST['__INPUT'];
+	   $input = file_get_contents('php://input');
 	   $data = array($__Class=>json_decode($input,true));
 	   if($this->controller->params['action']!='logout')
 		   foreach($data[$__Class] as $field=>$value){
@@ -180,7 +180,7 @@ class ApiComponent extends Object {
     protected function apiDelete(&$controller){
 	   $endpoint = $this->controller->params['controller'];
 	   $__Class = Inflector::classify($endpoint);
-	   $input = $_REQUEST['__INPUT'];
+	   $input = file_get_contents('php://input');
 	   $data = array($__Class=>json_decode($input,true));
 	   $this->controller->data = $data;
 	   $meta = array();
