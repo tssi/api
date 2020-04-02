@@ -5,6 +5,7 @@ class SlugRoute extends CakeRoute {
 		$params = parent::parse($url);
 		
 		$input = json_decode(file_get_contents('php://input'),true);
+
 		if (empty($params)) {
             return false;
         }
@@ -16,8 +17,10 @@ class SlugRoute extends CakeRoute {
 				$params['action']='delete';
 			break;
 			case 'PUT':
-				foreach($input as $key=>$value)
-					$_POST[$key] = $value;
+				if(is_array($input)):
+					foreach($input as $key=>$value)
+						$_POST[$key] = $value;
+				endif;
 				$params['action']='edit';
 			break;
 		}
