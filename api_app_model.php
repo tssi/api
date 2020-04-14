@@ -27,6 +27,8 @@ class ApiAppModel extends Model {
 					$field =  array_keys($cv)[0];
 					$value =  array_values($cv)[0];
 					$field = explode('.',$field)[1];
+					if(is_array($value))
+						$value = implode(',', $value);
 					array_push($prefix,$field.'-'.$value) ;
 				}
 			}
