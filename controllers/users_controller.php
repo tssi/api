@@ -9,6 +9,7 @@ class UsersController extends ApiAppController  {
 		parent::beforeFilter();
         $this->Auth->autoRedirect = false;
 		$this->Auth->allow(array('login','add'));
+		$this->Auth->userScope = array('User.status' => 'ACTIV');
 		
     }
 	function login(){
