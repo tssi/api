@@ -12,8 +12,6 @@ class ApiAppController extends Controller {
 	}
 	function redirect($config){
 		if($this->RequestHandler->isAjax()){
-			$message = $this->Session->read('Message.flash.message');
-			if($message) $this->Session->write('meta.message',$message);
 			$this->beforeRender();
 		}else{
 			return parent::redirect($config);
@@ -21,6 +19,8 @@ class ApiAppController extends Controller {
 	}
 	function beforeRender(){
 		if($this->isAPIRequest()){
+			$message = $this->Session->read('Message.flash.message');
+			if($message) $this->Session->write('meta.message',$message);
 			$this->sanitizeApiRequest();
 			
 		}else{
