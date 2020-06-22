@@ -2,7 +2,8 @@
 	//API Routing
 	$master_routes = Configure::read('Api.MASTER_ROUTES');
 	$master_routes = explode('|',$master_routes);
-	Router::parseExtensions('json');
+	Router::parseExtensions('json','csv');
+	
 	Router::connect(
 			"/login",
 			array("plugin"=>"api","controller"=>'users',"action" => "login")

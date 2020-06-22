@@ -159,6 +159,7 @@ class ApiComponent extends Object {
 	   $input = file_get_contents('php://input');
 	   $data = array($__Class=>json_decode($input,true));
 	   if($this->controller->params['action']!='logout')
+	   		if(is_array($data[$__Class]))
 		   foreach($data[$__Class] as $field=>$value){
 			  
 			   if(is_array($value)){
