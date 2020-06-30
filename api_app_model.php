@@ -98,13 +98,15 @@ class ApiAppModel extends Model {
  		parent::afterDelete();
  		$this->clearCacheFolder();
  	}
- 	protected function clearCacheFolder(){
- 		if($this->usePaginationCache):
+ 	protected function clearCacheFolder($force=false,$path=null){
+ 		if($this->usePaginationCache || $force):
 	 		$folder = strtolower($this->name);
-	 		$path = CACHE . $this->cacheDirectory.DS.$folder;
+	 		if($path ==null)
+	 			$path = CACHE . $this->cacheDirectory.DS.$folder;
 	 		App::import('Folder');
 	 		$cacheFolder = new Folder($path);
 	 		$cacheFolder->delete();
+	 		$cacheFolder = new Folder($path, true);
  		endif;
  	}
     protected function delete_cache_data($name = null, $conf = 'system01') {
