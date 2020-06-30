@@ -89,9 +89,26 @@ class ApiAppModel extends Model {
 		$expires = $this->cacheExpires;
 		return $expires;
     }
- 
-    protected function delete_cache_data($name = null, $conf = 'system') {
-		if($conf == 'system')
+
+ 	public function afterSave($created){
+ 		parent::afterSave($created);
+ 		$this->clearCacheFolder();
+ 	}
+ 	public function afterDelete(){
+ 		parent::afterDelete();
+ 		$this->clearCacheFolder();
+ 	}
+ 	protected function clearCacheFolder(){
+ 		if($this->usePaginationCache):
+	 		$folder = strtolower($this->name);
+	 		$path = CACHE . $this->cacheDirectory.DS.$folder;
+	 		App::import('Folder');
+	 		$cacheFolder = new Folder($path);
+	 		$cacheFolder->delete();
+ 		endif;
+ 	}
+    protected function delete_cache_data($name = null, $conf = 'system01') {
+		if($conf == 'system01')
 			$conf = strtolower($this->alias);
 		
 	   $this->_set_cache_config($conf);
