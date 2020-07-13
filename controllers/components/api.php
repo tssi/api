@@ -56,13 +56,22 @@ class ApiComponent extends Object {
 		if($sort){
 			switch($sort){
 				case 'latest':
+					$sort = 'modified';
 					$direction = 'desc';
 				break;
 				case 'oldest':
+					$sort = 'modified';
 					$direction = 'asc';
 				break;
+				default:
+					$sortParam = explode('-',$sort);
+					if(count($sortParam)==2):
+						$sort =  $sortParam[0];
+						$direction =  $sortParam[1];
+					endif;
+				break;
 			}
-			$sort = 'modified';
+			
 		}
 		//Filter
 		$conditions = array();
