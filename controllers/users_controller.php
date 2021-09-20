@@ -19,26 +19,51 @@ class UsersController extends ApiAppController  {
 				$this->redirect('/');
 		}
 		if(isset($this->data['User'])){
+			$password  = $this->data['User']['password'];
 			if($this->isAPIRequest())
-				$this->data['User']['password'] =  $this->Auth->password($this->data['User']['password']);
+				$this->data['User']['password'] =  $this->Auth->password($password);
 			if($this->Auth->login($this->data['User'])){
 				$user = $this->Auth->user();
 				if(!$this->RequestHandler->isAjax()){
 					$this->redirect('/');
 				}
 			}else{
+				$verifiedHash = false;
 				$username = $this->data['User']['username'];
 				$user = $this->User->findByUsername($username);
-				$this->Session->setFlash(__('Invalid username/password', true));
-				if($user){
-					$user['User']['login_failed']=$user['User']['login_failed']+1;
-					$user['User']['ip_failed']=$this->getIPAddr();
-					$this->User->save($user);
-					if($user['User']['status']!='ACTIV'){
-						$this->Session->setFlash(__('Account not active', true));
+				// Verify erb_hash if no password set yet
+				if($user['User']['password']=='' && isset($user['User']['erb_hash'])):
+					$hash = md5($password);
+					$erbHash = $user['User']['erb_hash'];
+					$verifiedHash =  $hash==$erbHash;
+					if($verifiedHash):
+						$user['User']['password'] = $this->Auth->password($password);
+						$user['User']['erb_hash'] =  null;
+						$this->User->save($user);
+
+						if($this->Auth->login($this->data['User'])):
+							$user = $this->Auth->user();
+							if(!$this->RequestHandler->isAjax()):
+								$this->redirect('/');
+							endif;
+						else:
+							$verifiedHash = false;
+						endif;
+					endif;
+				endif;
+
+				if(!$verifiedHash):
+					$this->Session->setFlash(__('Invalid username/password', true));
+					if($user){
+						$user['User']['login_failed']=$user['User']['login_failed']+1;
+						$user['User']['ip_failed']=$this->getIPAddr();
+						$this->User->save($user);
+						if($user['User']['status']!='ACTIV'){
+							$this->Session->setFlash(__('Account not active', true));
+						}
 					}
-				}
-				$user = array('User'=>null);
+					$user = array('User'=>null);
+				endif;
 			}
 		}
 		if(isset($user['User']['id'])){
