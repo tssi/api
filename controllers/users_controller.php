@@ -189,6 +189,7 @@ class UsersController extends ApiAppController  {
 			$defaultPass = $config['DEFAULT_PASS'];
 		}
 		$this->data['User']['password']=$this->Auth->password($defaultPass);
+		$this->data['User']['erb_hash']=null;
 		if ($this->User->save($this->data['User'])) {
 			$this->Session->setFlash(__('Password has been reset', true));
 			$this->redirect(array('action'=>'index'));
