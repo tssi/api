@@ -62,7 +62,7 @@ class UsersController extends ApiAppController  {
 							$this->Session->setFlash(__('Account not active', true));
 						}
 					}
-					$user = array('User'=>null);
+					$user = array('User'=>array());
 				endif;
 			}
 		}
