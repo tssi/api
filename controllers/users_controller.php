@@ -98,6 +98,7 @@ class UsersController extends ApiAppController  {
 	}
 	function logout(){
 		$this->set('user', array('User'=>array('logout'=>1)));
+		$this->Session->delete('TableRegistry');
 		$this->Auth->logout();
 		if(!$this->isAPIRequest()){
 			$this->redirect('login');
