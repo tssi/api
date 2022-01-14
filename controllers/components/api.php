@@ -191,6 +191,8 @@ class ApiComponent extends Object {
 	   $endpoint = $this->controller->params['controller'];
 	   $__Class = Inflector::classify($endpoint);
 	   $input = file_get_contents('php://input');
+	   if(!$input)
+			$input = $_REQUEST['__INPUT'];
 	   $data = array($__Class=>json_decode($input,true));
 	   $this->controller->data = $data;
 	   $meta = array();
