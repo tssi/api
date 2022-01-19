@@ -70,6 +70,13 @@ class ApiAppModel extends Model {
  
 		$expires = $this->_set_expiry();
 		$path = CACHE . $this->cacheDirectory.DS. $conf;
+		if($_SERVER['HTTP_HOST']=='localhost'):
+			$path = CACHE . $this->cacheDirectory.DS. $conf;
+			$db = ConnectionManager::getDataSource('default');
+			$dbName = $db->config['database'];
+			$path = CACHE . $this->cacheDirectory.DS. $dbName.DS.$conf;
+		endif;
+		
 	 
 		///// create folder if not exists
 		App::import('Folder');
