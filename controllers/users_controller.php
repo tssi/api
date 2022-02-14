@@ -28,11 +28,12 @@ class UsersController extends ApiAppController  {
 					$this->redirect('/');
 				}
 			}else{
-				$verifiedHash = false;
+				$verifiedHash = true;
 				$username = $this->data['User']['username'];
 				$user = $this->User->findByUsername($username);
 				// Verify erb_hash if no password set yet
 				if($user['User']['password']=='' && isset($user['User']['erb_hash'])):
+					$verifiedHash = false;
 					$hash = md5($password);
 					$erbHash = $user['User']['erb_hash'];
 					$verifiedHash =  $hash==$erbHash;
