@@ -18,7 +18,21 @@ class UsersController extends ApiAppController  {
 			if(!$this->isAPIRequest())
 				$this->redirect('/');
 		}
+		$allowLogin = true;
+		if(basename(ROOT)=='sap'):
+			$_ENB_CONF = $this->MasterConfig->getVars(array('SAP_DISABLE_ON'));
+			$_ENB_CONF['SAP_DISABLE_ON']=strtotime($_ENB_CONF['SAP_DISABLE_ON']);
+			$_SRV_TIME = time();
+			$allowLogin = $_SRV_TIME<$_ENB_CONF['SAP_DISABLE_ON'];
+		endif;
 		if(isset($this->data['User'])){
+			if(!$allowLogin):
+				$this->Session->setFlash(__('Portal not yet ready', true));
+				$user = array("User"=>array('user'=>"Access denied"));
+				$this->cakeError('invalidLogin');
+				return $this->set('user', $user);
+			endif;
+
 			$password  = $this->data['User']['password'];
 			if($this->isAPIRequest())
 				$this->data['User']['password'] =  $this->Auth->password($password);
