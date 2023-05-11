@@ -23,7 +23,7 @@ class UsersController extends ApiAppController  {
 			$_ENB_CONF = $this->MasterConfig->getVars(array('SAP_DISABLE_ON'));
 			$_ENB_CONF['SAP_DISABLE_ON']=strtotime($_ENB_CONF['SAP_DISABLE_ON']);
 			$_SRV_TIME = time();
-			$allowLogin = $_SRV_TIME<$_ENB_CONF['SAP_DISABLE_ON'];
+			$allowLogin = $_SRV_TIME>$_ENB_CONF['SAP_DISABLE_ON'];
 		endif;
 		if(isset($this->data['User'])){
 			if(!$allowLogin):
