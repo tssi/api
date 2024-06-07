@@ -19,11 +19,28 @@ class UsersController extends ApiAppController  {
 				$this->redirect('/');
 		}
 		$allowLogin = true;
+
 		if(basename(ROOT)=='sap'):
-			$_ENB_CONF = $this->MasterConfig->getVars(array('SAP_DISABLE_ON'));
+			$_ENB_CONF = $this->MasterConfig->getVars(array('SAP_DISABLE_ON','SAP_ENABLE_ON'));
 			$_ENB_CONF['SAP_DISABLE_ON']=strtotime($_ENB_CONF['SAP_DISABLE_ON']);
-			$_SRV_TIME = time();
-			$allowLogin = $_SRV_TIME>$_ENB_CONF['SAP_DISABLE_ON'];
+			$_ENB_CONF['SAP_ENABLE_ON']=strtotime($_ENB_CONF['SAP_ENABLE_ON']);
+			
+			// Converting time strings into timestamps
+			$disableOn = ($_ENB_CONF['SAP_DISABLE_ON']);
+			$enableOn = ($_ENB_CONF['SAP_ENABLE_ON']);
+			$sysTime = time(); // Current server time
+
+			// Initialize the login permission variable
+			$allowLogin = true;
+			// Logic to determine if login is allowed
+			if ($sysTime > $disableOn) {
+			    $allowLogin = false; // Default to not allowing login
+			    if ($sysTime > $enableOn && $enableOn > $disableOn) {
+			        $allowLogin = true; // Allow login if current time is past enable time and enable time is after disable time
+			    }
+			}
+			
+
 		endif;
 		if(isset($this->data['User'])){
 			if(!$allowLogin):
