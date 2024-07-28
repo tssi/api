@@ -10,11 +10,11 @@ class ApiAppController extends Controller {
 		$this->paginate = array('limit'=>10);
 		$this->Auth->allow('display');
 	}
-	function redirect($config){
+	function redirect($url, $status = null, $exit = true){
 		if($this->RequestHandler->isAjax()){
 			$this->beforeRender();
 		}else{
-			return parent::redirect($config);
+			return parent::redirect($url, $status, $exit);
 		}
 	}
 	function beforeRender(){
