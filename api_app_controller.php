@@ -1,4 +1,9 @@
 <?php
+if (!defined('CAKE_VERSION') && class_exists('Configure') && Configure::version()):
+    define('CAKE_VERSION',Configure::version());
+else:
+    define('CAKE_VERSION','Unknown');
+endif;
 class ApiAppController extends Controller {
 	var $name = 'ApiApp';
 	var $components = array('RequestHandler','Auth','Session','Api.Api');
@@ -14,7 +19,11 @@ class ApiAppController extends Controller {
 		if($this->RequestHandler->isAjax()){
 			$this->beforeRender();
 		}else{
-			return parent::redirect($url, $status, $exit);
+			if(CAKE_VERSION=='1.3.20'):
+				return parent::redirect($url);
+			else:
+				return parent::redirect($url, $status, $exit);
+			endif;
 		}
 	}
 	function beforeRender(){
