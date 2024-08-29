@@ -6,7 +6,7 @@ if (!class_exists('CakeObject')) :
     }
 endif;
 
-class ApiComponent extends Object {
+class ApiComponent extends CakeObject {
 	function initialize(&$controller, $settings = array()) {
         // saving the controller reference for later use
         $this->controller =& $controller;
