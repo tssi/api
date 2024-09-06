@@ -1,6 +1,12 @@
 <?php
+// PATCH: Check if CakeObject is not defined
+if (!class_exists('CakeObject')) :
+    class CakeObject extends Object {
+        // Class definition
+    }
+endif;
 
-class ApiComponent extends Object {
+class ApiComponent extends CakeObject {
 	function initialize(&$controller, $settings = array()) {
         // saving the controller reference for later use
         $this->controller =& $controller;

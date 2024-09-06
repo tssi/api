@@ -45,13 +45,15 @@ class ApiAppModel extends Model {
 			$pagination = Cache::read($prefix, $conf);
 	 
 		}
+		$contain = null;
 		if (!empty($extra['contain'])) {
 				$contain = $extra['contain'];
 			}
-	 
+	 	$joins = null;
 		if (!empty($extra['joins'])) {
 				$joins = $extra['joins'];
 			}
+		$group = null;
 		if (!empty($extra['group'])) {
 				$group = $extra['group'];
 		}
