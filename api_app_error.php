@@ -10,6 +10,8 @@ class ApiAppError extends ErrorHandler {
 	function invalidLogin($params){
 		$code = 401;
 		$message = $this->CODES[$code];
+		if(isset($params['message']))
+			$message = $params['message'];
 		$this->fetchError($code,$message);
 	}
 	function invalidEndpoint($params){

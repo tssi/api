@@ -43,10 +43,13 @@ class UsersController extends ApiAppController  {
 
 		endif;
 		if(isset($this->data['User'])){
-			if(!$allowLogin):
-				$this->Session->setFlash(__('Portal not yet ready', true));
+			$isAdmin =  $this->data['User']['username']=='admin';
+
+			if(!$allowLogin && !$isAdmin):
+				$params = array('message'=>'Portal not yet ready');
+				$this->Session->setFlash(__($params['message'], true));
 				$user = array("User"=>array('user'=>"Access denied"));
-				$this->cakeError('invalidLogin');
+				$this->cakeError('invalidLogin',$params);
 				return $this->set('user', $user);
 			endif;
 
