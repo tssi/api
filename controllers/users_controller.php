@@ -59,6 +59,7 @@ class UsersController extends ApiAppController  {
 				$this->data['User']['password'] =  $this->Auth->password($password);
 			if($this->Auth->login($this->data['User'])){
 				$user = $this->Auth->user();
+				$this->Session->setFlash(__('Login successful', true));
 				if(!$this->RequestHandler->isAjax()){
 					$this->redirect('/');
 				}
@@ -103,7 +104,8 @@ class UsersController extends ApiAppController  {
 						$user = array('User'=>null);
 					endif;
 				else:
-					$user = array('User'=>null);
+						$user = array('User'=>null);
+						$this->Session->setFlash(__('Invalid username/password', true));
 				endif;
 			}
 		}
