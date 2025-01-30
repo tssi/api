@@ -42,6 +42,7 @@ class UsersController extends ApiAppController  {
 			
 
 		endif;
+		$user = array('User'=>null);
 		if(isset($this->data['User'])){
 			$isAdmin =  $this->data['User']['username']=='admin';
 
@@ -65,38 +66,43 @@ class UsersController extends ApiAppController  {
 				$verifiedHash = isset($user['User']['erb_hash']);
 				$username = $this->data['User']['username'];
 				$user = $this->User->findByUsername($username);
-				// Verify erb_hash if no password set yet
-				if($user['User']['password']=='' && isset($user['User']['erb_hash'])):
-					$verifiedHash = false;
-					$hash = md5($password);
-					$erbHash = $user['User']['erb_hash'];
-					$verifiedHash =  $hash==$erbHash;
-					if($verifiedHash):
-						$user['User']['password'] = $this->Auth->password($password);
-						$user['User']['erb_hash'] =  null;
-						$this->User->save($user);
 
-						if($this->Auth->login($this->data['User'])):
-							$user = $this->Auth->user();
-							if(!$this->RequestHandler->isAjax()):
-								$this->redirect('/');
+				if($user):
+					// Verify erb_hash if no password set yet
+					if($user['User']['password']=='' && isset($user['User']['erb_hash'])):
+						$verifiedHash = false;
+						$hash = md5($password);
+						$erbHash = $user['User']['erb_hash'];
+						$verifiedHash =  $hash==$erbHash;
+						if($verifiedHash):
+							$user['User']['password'] = $this->Auth->password($password);
+							$user['User']['erb_hash'] =  null;
+							$this->User->save($user);
+
+							if($this->Auth->login($this->data['User'])):
+								$user = $this->Auth->user();
+								if(!$this->RequestHandler->isAjax()):
+									$this->redirect('/');
+								endif;
+							else:
+								$verifiedHash = false;
 							endif;
-						else:
-							$verifiedHash = false;
 						endif;
 					endif;
-				endif;
 
-				if(!$verifiedHash):
-					$this->Session->setFlash(__('Invalid username/password', true));
-					if($user){
-						$user['User']['login_failed']=$user['User']['login_failed']+1;
-						$user['User']['ip_failed']=$this->getIPAddr();
-						$this->User->save($user);
-						if($user['User']['status']!='ACTIV'){
-							$this->Session->setFlash(__('Account not active', true));
+					if(!$verifiedHash):
+						$this->Session->setFlash(__('Invalid username/password', true));
+						if($user){
+							$user['User']['login_failed']=$user['User']['login_failed']+1;
+							$user['User']['ip_failed']=$this->getIPAddr();
+							$this->User->save($user);
+							if($user['User']['status']!='ACTIV'){
+								$this->Session->setFlash(__('Account not active', true));
+							}
 						}
-					}
+						$user = array('User'=>null);
+					endif;
+				else:
 					$user = array('User'=>null);
 				endif;
 			}
