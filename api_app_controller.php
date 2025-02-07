@@ -70,6 +70,12 @@ class ApiAppController extends Controller {
 			$modelClass = $this->modelClass;
 			$this->data[$modelClass]['id'] = $this->$modelClass->id;
 			$response['data'] = $this->data;
+		}else{
+			$controller = $this->params['controller'];
+			if(isset($this->viewVars[$controller])):
+				$viewData = $this->viewVars[$controller];
+				$response['data'] = $viewData;
+			endif;
 		}
 		echo $this->encodeData($response);
 		$this->_stop();
