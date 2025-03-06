@@ -24,17 +24,36 @@ class Jwt extends ApiAppModel {
     function verifyJWT($token, $secretKey) {
         $parts = explode(".", $token);
         if (count($parts) !== 3) {
-            return false;
+            return false; // Invalid token structure
         }
 
         list($base64Header, $base64Payload, $base64Signature) = $parts;
-        
-        // Recalculate signature
-        $signature = hash_hmac('sha256', $base64Header . "." . $base64Payload, $secretKey, true);
-        $validSignature = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($signature));
 
-        return hash_equals($validSignature, $base64Signature);
+        // Decode Base64 (URL-safe variant)
+        $header = json_decode(base64_decode(str_replace(array('-', '_'), array('+', '/'), $base64Header)), true);
+        $payload = json_decode(base64_decode(str_replace(array('-', '_'), array('+', '/'), $base64Payload)), true);
+        $signature = base64_decode(str_replace(array('-', '_'), array('+', '/'), $base64Signature));
+
+        if (!$header || !$payload) {
+            return false; // Invalid JSON structure
+        }
+
+        // Recalculate signature
+        $expectedSignature = hash_hmac('sha256', $base64Header . "." . $base64Payload, $secretKey, true);
+
+        // Verify signature (no `hash_equals()` in PHP 5)
+        if ($signature !== $expectedSignature) {
+            return false;
+        }
+
+        // Check expiration time (if present)
+        if (isset($payload['exp']) && $payload['exp'] < time()) {
+            return false; // Token expired
+        }
+
+        return $payload; // Return decoded payload if valid
     }
+
 
     function decodeJWT($token) {
         $parts = explode(".", $token);

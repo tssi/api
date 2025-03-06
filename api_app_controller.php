@@ -39,6 +39,26 @@ class ApiAppController extends Controller {
 	protected function isAPIRequest(){
 		return $this->RequestHandler->isAjax()||$this->RequestHandler->ext=='json';
 	}
+	protected function hasBearerToken() {
+		$headers = ['HTTP_AUTHORIZATION', 'REDIRECT_HTTP_AUTHORIZATION'];
+	    $token = null;
+	    $hasBearerToken=false;
+
+	    foreach ($headers as $header) {
+	        if (isset($_SERVER[$header]) && preg_match('/Bearer\s(\S+)/', $_SERVER[$header], $matches)) {
+	            $token = $matches[1]; // Extract only the token
+	            break;
+	        }
+	    }
+
+	    if ($token) {
+	        $this->Session->write('AGIMAT_TOKEN', $token);
+	        $hasBearerToken=true;
+	    }
+
+	    return $hasBearerToken;
+	}
+	
 	protected function sanitizeApiRequest(){
 		if($this->name=='CakeError'){
 			if(isset($this->viewVars['title'])){
