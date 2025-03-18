@@ -10,7 +10,7 @@ class Jwt extends ApiAppModel {
         // Payload
         $payload = json_encode([
             "student_id" => $studentId,
-            "exp" => time() + 500 // Token expires in 5 mins add to master config
+            "exp" => time() + 300 // Token expires in 5 mins add to master config
         ]);
         $base64Payload = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($payload));
 
