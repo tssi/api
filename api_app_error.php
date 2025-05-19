@@ -63,7 +63,10 @@ class ApiAppError extends ErrorHandler {
 		$this->fetchError($code,$message);
 	}
 	protected function fetchError($code,$message){
-		$this->controller->header('HTTP/1.1  '.$code.' '.$message);
+		header("Pragma: no-cache");
+		header("Cache-Control: no-store, no-cache, max-age=0, must-revalidate");
+		header('Content-Type: application/json');
+		header('HTTP/1.1 '.$code.' '.$message);
 		$response = compact('code','message');
 		echo json_encode($response,JSON_NUMERIC_CHECK );
 	}
