@@ -6,6 +6,7 @@ class ApiAppError extends ErrorHandler {
 			403=>'Invalid Endpoint',
 			402=>'Data not set',
 			404=>'Empty Record',
+			405=>'Invalid Token',
 	);
 	function invalidLogin($params){
 		$code = 401;
@@ -27,6 +28,13 @@ class ApiAppError extends ErrorHandler {
 	function emptyRecord($params){
 		$code = 404;
 		$message = $this->CODES[$code];
+		$this->fetchError($code,$message);
+	}
+	function invalidToken($params){
+		$code = 405;
+		$message = $this->CODES[$code];
+		if(isset($params['token']))
+			$message .= ' - Token: ' . $params['token'];
 		$this->fetchError($code,$message);
 	}
 	function noResults($params){
