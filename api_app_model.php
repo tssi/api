@@ -110,8 +110,12 @@ class ApiAppModel extends Model {
  	protected function clearCacheFolder($force=false,$path=null){
  		if($this->usePaginationCache || $force):
 	 		$folder = strtolower($this->name);
-	 		if($path ==null)
-	 			$path = CACHE . $this->cacheDirectory.DS.$folder;
+	 		if($path ==null):
+				$path = CACHE . $this->cacheDirectory.DS.$folder;
+			else:
+				$path = CACHE . $this->cacheDirectory.DS.$path;
+
+			endif;
 	 		App::import('Folder');
 	 		$cacheFolder = new Folder($path);
 	 		$cacheFolder->delete();
