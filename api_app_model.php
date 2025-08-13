@@ -113,13 +113,26 @@ class ApiAppModel extends Model {
 	 		if($path ==null):
 				$path = CACHE . $this->cacheDirectory.DS.$folder;
 			else:
+				$folder = $path;
 				$path = CACHE . $this->cacheDirectory.DS.$path;
 
 			endif;
-	 		App::import('Folder');
-	 		$cacheFolder = new Folder($path);
-	 		$cacheFolder->delete();
-	 		$cacheFolder = new Folder($path, true);
+			
+			// if localhost delete the cache folder for the default database
+			if($_SERVER['HTTP_HOST']=='localhost'):
+				$db = ConnectionManager::getDataSource('default');
+				$dbName = $db->config['database'];
+				$path = CACHE . $this->cacheDirectory.DS.$dbName.DS.$folder;
+				$cacheFolder = new Folder($path, true);
+				$cacheFolder->delete();
+				$cacheFolder = new Folder($path, true);
+			else:
+				App::import('Folder');
+				$cacheFolder = new Folder($path);
+				$cacheFolder->delete();
+				$cacheFolder = new Folder($path, true);
+			endif;
+
  		endif;
  	}
     protected function delete_cache_data($name = null, $conf = 'system01') {
