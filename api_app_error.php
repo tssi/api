@@ -7,12 +7,18 @@ class ApiAppError extends ErrorHandler {
 			402=>'Data not set',
 			404=>'Empty Record',
 			405=>'Invalid Token',
+			406=>'You are not authorized to add admin users'
 	);
 	function invalidLogin($params){
 		$code = 401;
 		$message = $this->CODES[$code];
 		if(isset($params['message']))
 			$message = $params['message'];
+		$this->fetchError($code,$message);
+	}
+	function invalidAdminUser($params){
+		$code = 406;
+		$message = $this->CODES[$code];
 		$this->fetchError($code,$message);
 	}
 	function invalidEndpoint($params){

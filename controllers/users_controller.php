@@ -162,6 +162,13 @@ class UsersController extends ApiAppController  {
 
 	function add() {
 		if (!empty($this->data)) {
+			$data = $this->data;
+			$isAdmin =  $this->Auth->user('user_type_id') == 'admin';
+			if($data['User']['user_type_id'] == 'admin' && !$isAdmin){
+				$this->Session->setFlash(__('You are not authorized to add admin users', true));
+				$this->cakeError('invalidAdminUser');
+				$this->redirect(array('action' => 'index'));
+			}
 			$this->User->create();
 			if($this->isApiRequest()){
 				if(isset($this->data['User']['password']))
