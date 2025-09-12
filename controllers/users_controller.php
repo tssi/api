@@ -59,6 +59,12 @@ class UsersController extends ApiAppController  {
 				$this->data['User']['password'] =  $this->Auth->password($password);
 			if($this->Auth->login($this->data['User'])){
 				$user = $this->Auth->user();
+				if($user['User']['user_type_id']=='stdnt'):
+					$this->User->Student->recursive = -1;
+					$stud = $this->User->Student->findById($user['User']['username']);
+					$user['User']['student_name'] = $stud['Student']['short_name'];
+				endif;
+
 				$this->Session->setFlash(__('Login successful', true));
 				if(!$this->RequestHandler->isAjax()){
 					$this->redirect('/');
