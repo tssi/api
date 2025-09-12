@@ -39,6 +39,11 @@ class UsersController extends ApiAppController  {
 			        $allowLogin = true; // Allow login if current time is past enable time and enable time is after disable time
 			    }
 			}
+
+			$bypassValidated = $this->Session->read('BypassValidate');
+			if(bypassValidated){
+				$allowLogin = true;
+			}
 			
 
 		endif;
@@ -146,6 +151,7 @@ class UsersController extends ApiAppController  {
 		$this->set('user', $user);
 	}
 	function logout(){
+		$this->Session->delete('BypassValidate');
 		$this->set('user', array('User'=>array('logout'=>1)));
 		$this->Session->delete('TableRegistry');
 		$this->Auth->logout();
