@@ -5,6 +5,7 @@ class ApiAppModel extends Model {
 	var $cacheExpires = '+1 day';
 	var $cacheDirectory = 'system01';
 	var $usePaginationCache = false;
+	var $clearingCache = false;
 	function paginate ($conditions, $fields, $order, $limit, $page = 1, $recursive = null, $extra = array()) {
  
 		if ((Configure::read('Cache.disable') === false) && (Configure::read('Cache.check') === true) && $this->usePaginationCache) {
@@ -71,18 +72,32 @@ class ApiAppModel extends Model {
 	protected function _set_cache_config ($conf) {
  
 		$expires = $this->_set_expiry();
+		// Sanitize conf parameter to prevent invalid path characters
+		$conf = preg_replace('/[^a-zA-Z0-9_\-\.]/', '', $conf);
+		
 		$path = CACHE . $this->cacheDirectory.DS. $conf;
 		if($_SERVER['HTTP_HOST']=='localhost'):
 			$path = CACHE . $this->cacheDirectory.DS. $conf;
 			$db = ConnectionManager::getDataSource('default');
 			$dbName = $db->config['database'];
+			// Sanitize database name to prevent invalid path characters
+			$dbName = preg_replace('/[^a-zA-Z0-9_\-\.]/', '', $dbName);
 			$path = CACHE . $this->cacheDirectory.DS. $dbName.DS.$conf;
 		endif;
+		
+		// Ensure path doesn't end with invalid characters
+		$path = rtrim($path, '\\/');
+		$path = str_replace('\\', DS, $path);
+		$path = str_replace('/', DS, $path);
 		
 	 
 		///// create folder if not exists
 		App::import('Folder');
-		$Folder = new Folder($path, true); //, '755');
+		$Folder = new Folder($path, true, 0755);
+		// Ensure folder is writable
+		if (is_dir($path)) {
+			chmod($path, 0755);
+		}
 		unset ($Folder);
 	 
 		Cache::config($conf, array(
@@ -107,33 +122,59 @@ class ApiAppModel extends Model {
  		parent::afterDelete();
  		$this->clearCacheFolder();
  	}
- 	protected function clearCacheFolder($force=false,$path=null){
- 		if($this->usePaginationCache || $force):
+	protected function clearCacheFolder($force=false,$path=null){
+		// Prevent infinite loops
+		if($this->clearingCache) {
+			return;
+		}
+		$this->clearingCache = true;
+		
+		if($this->usePaginationCache || $force):
 	 		$folder = strtolower($this->name);
+	 		// Sanitize folder name to prevent invalid path characters
+	 		$folder = preg_replace('/[^a-z0-9_-]/', '', $folder);
+	 		
 	 		if($path ==null):
 				$path = CACHE . $this->cacheDirectory.DS.$folder;
 			else:
 				$folder = $path;
-				$path = CACHE . $this->cacheDirectory.DS.$path;
-
+				// Sanitize path to prevent invalid characters
+				$folder = preg_replace('/[^a-zA-Z0-9_\-\.\/\\\\]/', '', $folder);
+				$path = CACHE . $this->cacheDirectory.DS.$folder;
 			endif;
+			
+			// Ensure path doesn't end with invalid characters
+			$path = rtrim($path, '\\/');
+			$path = str_replace('\\', DS, $path);
+			$path = str_replace('/', DS, $path);
 			
 			// if localhost delete the cache folder for the default database
 			if($_SERVER['HTTP_HOST']=='localhost'):
 				$db = ConnectionManager::getDataSource('default');
 				$dbName = $db->config['database'];
 				$path = CACHE . $this->cacheDirectory.DS.$dbName.DS.$folder;
-				$cacheFolder = new Folder($path, true);
+				$cacheFolder = new Folder($path, true, 0755);
 				$cacheFolder->delete();
-				$cacheFolder = new Folder($path, true);
+				$cacheFolder = new Folder($path, true, 0755);
+				// Ensure folder is writable
+				if (is_dir($path)) :
+					chmod($path, 0755);
+				endif;
 			else:
 				App::import('Folder');
 				$cacheFolder = new Folder($path);
 				$cacheFolder->delete();
-				$cacheFolder = new Folder($path, true);
+				$cacheFolder = new Folder($path, true, 0755);
+				// Ensure folder is writable
+				if (is_dir($path)) {
+					chmod($path, 0755);
+				}
 			endif;
 
  		endif;
+ 		
+		// Reset the flag
+		$this->clearingCache = false;
  	}
     protected function delete_cache_data($name = null, $conf = 'system01') {
 		if($conf == 'system01')
