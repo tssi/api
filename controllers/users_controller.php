@@ -41,7 +41,7 @@ class UsersController extends ApiAppController  {
 			}
 
 			$bypassValidated = $this->Session->read('BypassValidate');
-			if(bypassValidated){
+			if($bypassValidated){
 				$allowLogin = true;
 			}
 			
