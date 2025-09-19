@@ -68,6 +68,13 @@ class UsersController extends ApiAppController  {
 					$this->User->Student->recursive = -1;
 					$stud = $this->User->Student->findById($user['User']['username']);
 					$user['User']['student_name'] = $stud['Student']['short_name'];
+					
+					// Check if password_changed is null, the include is response password_change_required
+					if($user['User']['password_changed']==null):
+						$user['User']['password_change_required'] = true;
+					endif; 
+					unset($user['User']['plain_password']);
+					unset($user['User']['id']);
 				endif;
 
 				$this->Session->setFlash(__('Login successful', true));
