@@ -20,6 +20,24 @@ class UsersController extends ApiAppController  {
 		}
 		$allowLogin = true;
 
+		$isInMarqaDomain = strpos($_SERVER['HTTP_HOST'], 'marqa.one') !== false;
+		if($isInMarqaDomain):
+			if(!isset($this->data['User']['turnstile_token'])):
+				$params = array('message'=>'Turnstile token is required');
+				$user = array("User"=>array('user'=>"Access denied"));
+				$this->cakeError('invalidLogin',$params);
+				return $this->set('user', $user);
+			endif;
+
+			$turnstileToken = $this->data['User']['turnstile_token'];
+			$verifiedToken = $this->verifyTurnstileToken($turnstileToken);
+			if(!$verifiedToken):
+				$params = array('message'=>'Invalid turnstile token');
+				$user = array("User"=>array('user'=>"Access denied"));
+				$this->cakeError('invalidLogin',$params);
+				return $this->set('user', $user);
+			endif;
+		endif;
 		if(basename(ROOT)=='sap'):
 			$_ENB_CONF = $this->MasterConfig->getVars(array('SAP_DISABLE_ON','SAP_ENABLE_ON'));
 			$_ENB_CONF['SAP_DISABLE_ON']=strtotime($_ENB_CONF['SAP_DISABLE_ON']);
@@ -277,6 +295,38 @@ class UsersController extends ApiAppController  {
 		    $ip = $_SERVER['REMOTE_ADDR'];
 		}
 		return $ip;
+	}
+
+	protected function verifyTurnstileToken($token){
+		$isVerified = false;
+		$_T_CONF = $this->MasterConfig->getVars(array('TURNSTILE_KEY','TURNSTILE_SECRET'));
+		if(!isset($_T_CONF['TURNSTILE_SECRET'])):
+			return false;
+		endif;
+		$url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+		$data = array(
+			'secret' => $_T_CONF['TURNSTILE_SECRET'],
+			'response' => $token,
+			'remoteip' => $this->getIPAddr()
+		);
+		$options = array(
+		'http' => array(
+			'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+			'method' => 'POST',
+			'content' => http_build_query($data)
+			)
+		);
+
+		$context = stream_context_create($options);
+		$response = file_get_contents($url, false, $context);
+
+		if ($response === FALSE) :
+			$isVerified = false;
+		endif;
+
+		$result = json_decode($response, true);
+		$isVerified = isset($result['success']) && $result['success'];
+		return $isVerified;
 	}
 }	
 	
