@@ -30,9 +30,11 @@ class UsersController extends ApiAppController  {
 			endif;
 
 			$turnstileToken = $this->data['User']['turnstile_token'];
-			$verifiedToken = $this->verifyTurnstileToken($turnstileToken);
-			if(!$verifiedToken):
+			$verificationResult = $this->verifyTurnstileToken($turnstileToken);
+			if(!$verificationResult['success']):
 				$params = array('message'=>'Invalid turnstile token');
+				$params['error-codes'] = $verificationResult['error-codes'];
+				$params['result'] = $verificationResult['result'];
 				$user = array("User"=>array('user'=>"Access denied"));
 				$this->cakeError('invalidLogin',$params);
 				return $this->set('user', $user);
@@ -298,10 +300,11 @@ class UsersController extends ApiAppController  {
 	}
 
 	protected function verifyTurnstileToken($token){
-		$isVerified = false;
+		$isVerified = array('success'=>false,'error-codes'=>array());
 		$_T_CONF = $this->MasterConfig->getVars(array('TURNSTILE_KEY','TURNSTILE_SECRET'));
 		if(!isset($_T_CONF['TURNSTILE_SECRET'])):
-			return false;
+			$isVerified['error-codes'][] = 'secret_not_set';
+			return $isVerified;
 		endif;
 		$url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 		$data = array(
@@ -321,11 +324,19 @@ class UsersController extends ApiAppController  {
 		$response = file_get_contents($url, false, $context);
 
 		if ($response === FALSE) :
-			$isVerified = false;
+			$isVerified['error-codes'][] = 'internal_error';
+			return $isVerified;
 		endif;
 
 		$result = json_decode($response, true);
-		$isVerified = isset($result['success']) && $result['success'];
+		
+		if(!empty($result)):
+			$isVerified['success'] = isset($result['success']) && $result['success'];
+			$isVerified['result'] = $result;
+			if(!$isVerified['success']):
+				$isVerified['error-codes'] = array_merge($isVerified['error-codes'], isset($result['error-codes']) ? $result['error-codes'] : array());
+			endif;
+		endif;
 		return $isVerified;
 	}
 }	
