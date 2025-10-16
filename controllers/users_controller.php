@@ -21,26 +21,28 @@ class UsersController extends ApiAppController  {
 		$allowLogin = true;
 
 		$isInMarqaDomain = strpos($_SERVER['HTTP_HOST'], 'marqa.one') !== false;
+		$skipChecking = true;
 		if($isInMarqaDomain):
-			if(!isset($this->data['User']['turnstile_token'])):
+			if(!isset($this->data['User']['turnstile_token']) && $skipChecking):
 				$params = array('message'=>'Turnstile token is required');
 				$user = array("User"=>array('user'=>"Access denied"));
 				$this->cakeError('invalidLogin',$params);
 				return $this->set('user', $user);
 			endif;
-
-			$turnstileToken = $this->data['User']['turnstile_token'];
-			$verificationResult = $this->verifyTurnstileToken($turnstileToken);
-			
-			if(!$verificationResult['success']):
-				$params = array('message'=>'Invalid turnstile token');
-				$params['error-codes'] = $verificationResult['error-codes'];
-				if(isset($verificationResult['result'])):
-					$params['result'] = $verificationResult['result'];
+			if(isset($this->data['User']['turnstile_token'])):
+				$turnstileToken = $this->data['User']['turnstile_token'];
+				$verificationResult = $this->verifyTurnstileToken($turnstileToken);
+				
+				if(!$verificationResult['success']):
+					$params = array('message'=>'Invalid turnstile token');
+					$params['error-codes'] = $verificationResult['error-codes'];
+					if(isset($verificationResult['result'])):
+						$params['result'] = $verificationResult['result'];
+					endif;
+					$user = array("User"=>array('user'=>"Access denied"));
+					$this->cakeError('invalidLogin',$params);
+					return $this->set('user', $user);
 				endif;
-				$user = array("User"=>array('user'=>"Access denied"));
-				$this->cakeError('invalidLogin',$params);
-				return $this->set('user', $user);
 			endif;
 		endif;
 		if(basename(ROOT)=='sap'):
