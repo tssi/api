@@ -23,7 +23,7 @@ class UsersController extends ApiAppController  {
 		$isInMarqaDomain = strpos($_SERVER['HTTP_HOST'], 'marqa.one') !== false;
 		$skipChecking = true;
 		if($isInMarqaDomain):
-			if(!isset($this->data['User']['turnstile_token']) && $skipChecking):
+			if(!isset($this->data['User']['turnstile_token']) && !$skipChecking):
 				$params = array('message'=>'Turnstile token is required');
 				$user = array("User"=>array('user'=>"Access denied"));
 				$this->cakeError('invalidLogin',$params);
